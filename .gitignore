@@ -4,4 +4,5 @@
 *.csr
 *.key
 *.srl
-certs/
+certs/*
+!certs/generate_sample_certs.sh
