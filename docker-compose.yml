@@ -1,0 +1,65 @@
+version: '3.9'
+
+services: 
+  openresty:
+    # image: my_repo/nginx
+    build: 
+      context: .
+      dockerfile: ./openresty.Dockerfile
+    ports: 
+      - 80:80
+      - 443:443
+    # healthcheck:
+    #   test: ['CMD', 'curl', '-f', 'http://localhost:80']
+    secrets:
+       - ssl_cert
+       - ssl_key
+    restart: always
+  postgres:
+    image: postgres:13
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    restart: always
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+#    command: ["-Dkeycloak.frontendUrl=https://18.214.183.240/auth"]
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: Pa55w0rd
+#      KEYCLOAK_LOGLEVEL: DEBUG
+      # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+      #JDBC_PARAMS: "ssl=true"
+    ports:
+      - 8080:8080
+      - 8443:8443
+    restart: always
+    # volumes:
+    #   - ./keycloak_conf/standalone.xml:/opt/jboss/keycloak/standalone/configuration/standalone.xml
+  flaskapp:
+    # image: my_repo/my_flask_app
+    build: 
+      context: .
+      dockerfile: ./flaskapp.Dockerfile
+    ports: 
+      - 5000:5000
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:5000/hello']
+      start_period: 7s
+    restart: always
+volumes:
+  keycloak_postgres_data:
+secrets:
+  ssl_cert:
+    file: sample.pem
+  ssl_key:
+    file: sample-key.pem
