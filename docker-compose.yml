@@ -6,6 +6,11 @@ services:
     build: 
       context: .
       dockerfile: ./openresty.Dockerfile
+      args:
+        - FRONTEND_HOSTNAME=${FRONTEND_HOSTNAME}
+        - DOCKER_HOST_URL=${DOCKER_HOST_URL}
+    env_file:
+      - .env
     ports: 
       - 80:80
       - 443:443
@@ -26,7 +31,7 @@ services:
     restart: always
   keycloak:
     image: quay.io/keycloak/keycloak:latest
-#    command: ["-Dkeycloak.frontendUrl=https://18.214.183.240/auth"]
+    command: ["-Dkeycloak.frontendUrl=${KEYCLOAK_FRONTEND_URL}"]
     environment:
       DB_VENDOR: POSTGRES
       DB_ADDR: postgres
@@ -40,8 +45,8 @@ services:
       # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
       #JDBC_PARAMS: "ssl=true"
     ports:
-      - 8080:8080
-      - 8443:8443
+      - ${KEYCLOAK_HTTP_PORT}:8080
+      - ${KEYCLOAK_HTTPS_PORT}:8443
     restart: always
     depends_on:
       - postgres
@@ -62,6 +67,6 @@ volumes:
   keycloak_postgres_data:
 secrets:
   ssl_cert:
-    file: certs/site.crt
+    file: ${SSL_CERTIFICATE_FILE}
   ssl_key:
-    file: certs/site.key
+    file: ${SSL_KEY_FILE}
