@@ -11,9 +11,13 @@ COPY ./nginx_conf/nginx.conf /etc/nginx/nginx.conf
 
 ## The COPY and RUN commands below produce a configuration file from the default.conf.template file and the docker .env variables
 ARG FRONTEND_HOSTNAME
+ARG FRONTEND_URL
 ARG DOCKER_HOST_URL
 COPY ./nginx_conf/default.conf.template /etc/nginx/default.conf.template
+COPY ./nginx_conf/access.lua.template /etc/nginx/access.lua.template
 RUN ["/bin/bash", "-c", "envsubst '$$FRONTEND_HOSTNAME $$DOCKER_HOST_URL' < /etc/nginx/default.conf.template > /etc/nginx/conf.d/default.conf"]
-RUN cat /etc/nginx/conf.d/default.conf
+RUN ["/bin/bash", "-c", "envsubst '$$FRONTEND_URL $$DOCKER_HOST_URL' < /etc/nginx/access.lua.template > /etc/nginx/access.lua"]
+
+RUN cat /etc/nginx/conf.d/default.conf && cat /etc/nginx/access.lua
 
 ENTRYPOINT ["/usr/local/openresty/nginx/sbin/nginx", "-g", "daemon off;"]

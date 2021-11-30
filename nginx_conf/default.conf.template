@@ -40,6 +40,8 @@ server {
         root   /usr/share/nginx/html;
     }
 
+    access_by_lua_file /etc/nginx/access.lua;
+
     #Simple proxy pass
     location /hello {
       proxy_pass      http://flaskapp:5000/hello;
@@ -48,33 +50,7 @@ server {
       access_by_lua return;
       proxy_pass      http://keycloak:8080/auth;
     }
-    #session_contents = {id_token=true}
-    access_by_lua '
-         local opts = {
-           redirect_uri_path = "/redirect_uri",
-           accept_none_alg = true,
-           discovery = "${DOCKER_HOST_URL}:8080/auth/realms/myrealm/.well-known/openid-configuration",
-           client_id = "openresty",
-           client_secret = "401a8b85-3850-4e93-8326-b1ae945cedc5",
-           redirect_uri_scheme = "https",
-           logout_path = "/logout",
-           redirect_after_logout_uri = "${DOCKER_HOST_URL}:8080/auth/realms/myrealm/protocol/openid-connect/logout?redirect_uri=${FRONTEND_URL}}",
-           redirect_after_logout_with_id_token_hint = false,
-           scope = "openid"
-         }
-         -- call introspect for OAuth 2.0 Bearer Access Token validation
-         local res, err, _, session = require("resty.openidc").authenticate(opts)
-         if err then
-           ngx.status = 403
-           ngx.say(err)
-           ngx.exit(ngx.HTTP_FORBIDDEN)
-         end
-         ngx.req.set_header("Authorization", "Bearer " .. tostring(res.access_token))
-         local cjson = require "cjson"
-         ngx.req.set_header("id_token", session.data.enc_id_token)
-         --ngx.req.set_header("id_token", cjson.encode(res.id_token))
-
-      ';
+    
  
       # I disabled caching so the browser won't cache the site.
       expires           0;
