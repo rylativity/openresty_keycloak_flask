@@ -8,6 +8,7 @@ services:
       dockerfile: ./openresty.Dockerfile
       args:
         - FRONTEND_HOSTNAME=${FRONTEND_HOSTNAME}
+        - FRONTEND_URL=${FRONTEND_URL}
         - DOCKER_HOST_URL=${DOCKER_HOST_URL}
         - KEYCLOAK_REALM_NAME=${KEYCLOAK_REALM_NAME}
     env_file:
