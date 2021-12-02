@@ -9,6 +9,7 @@ services:
       args:
         - FRONTEND_HOSTNAME=${FRONTEND_HOSTNAME}
         - DOCKER_HOST_URL=${DOCKER_HOST_URL}
+        - KEYCLOAK_REAML_NAME=${KEYCLOAK_REALM_NAME}
     env_file:
       - .env
     ports: 

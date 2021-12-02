@@ -7,3 +7,5 @@
 certs/*
 !certs/generate_sample_certs.sh
 !certs/*.cnf
+
+.env

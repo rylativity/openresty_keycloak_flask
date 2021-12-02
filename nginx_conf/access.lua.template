@@ -1,12 +1,12 @@
 local opts = {
     redirect_uri_path = "/redirect_uri",
     accept_none_alg = true,
-    discovery = "${DOCKER_HOST_URL}:8080/auth/realms/myrealm/.well-known/openid-configuration",
+    discovery = "${DOCKER_HOST_URL}:8080/auth/realms/${KEYCLOAK_REALM_NAME}/.well-known/openid-configuration",
     client_id = "openresty",
-    client_secret = "401a8b85-3850-4e93-8326-b1ae945cedc5",
+    client_secret = "a5efd60c-ba28-4cbb-8bae-1f69d7484329",
     redirect_uri_scheme = "https",
     logout_path = "/logout",
-    redirect_after_logout_uri = "${DOCKER_HOST_URL}:8080/auth/realms/myrealm/protocol/openid-connect/logout?redirect_uri=${FRONTEND_URL}}",
+    redirect_after_logout_uri = "${DOCKER_HOST_URL}:8080/auth/realms/${KEYCLOAK_REALM_NAME}/protocol/openid-connect/logout?redirect_uri=${FRONTEND_URL}}",
     redirect_after_logout_with_id_token_hint = false,
     scope = "openid"
   }
